@@ -3,8 +3,9 @@ from django.core.management.base import BaseCommand
 from django.db import connections
 from django.db.utils import OperationalError
 
+
 class Command(BaseCommand):
-    help = "Wait for database to be available"
+    help_text = "Wait for database to be available"
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.WARNING("Waiting for database..."))
@@ -12,11 +13,11 @@ class Command(BaseCommand):
         retries = 0
         while not db_conn:
             try:
-                db_conn = connections['default']
-                db_conn.cursor()  # відкриття курсора перевіряє доступність
+                db_conn = connections["default"]
+                db_conn.cursor()
             except OperationalError:
                 retries += 1
-                self.stdout.write(f"DB unavailable, retry {retries}... sleep 1s")
+                self.stdout.write(f"DB unavailable, retry {retries}; sleep 1s")
                 time.sleep(1)
             else:
                 break
