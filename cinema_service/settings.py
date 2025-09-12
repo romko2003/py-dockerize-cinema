@@ -11,9 +11,23 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# --- STATIC & MEDIA ---
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"
+
+STATIC_ROOT = os.getenv("STATIC_ROOT", os.path.join(BASE_DIR, "static"))
+MEDIA_ROOT = os.getenv("MEDIA_ROOT", os.path.join(BASE_DIR, "media"))
+
+# для dev: щоб роздавати media в DEBUG режимі (urls.py):
+# from django.conf import settings
+# from django.conf.urls.static import static
+# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 
 # Quick-start development settings - unsuitable for production
@@ -84,13 +98,17 @@ WSGI_APPLICATION = "cinema_service.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# --- DATABASES ---
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB", "cinema"),
+        "USER": os.getenv("POSTGRES_USER", "cinema"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "cinema"),
+        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
