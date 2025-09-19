@@ -22,13 +22,15 @@ class Command(BaseCommand):
                 conn.cursor()
             except OperationalError as exc:
                 retries += 1
-                self.stdout.write(f"DB unavailable ({exc}), retry {retries}; sleep {delay}s")
+                self.stdout.write(f"DB unavailable ({exc}), retry "
+                                  f"{retries}; sleep {delay}s")
                 time.sleep(delay)
             else:
                 break
 
         if not conn:
-            self.stderr.write(self.style.ERROR("Database is not available after retries"))
+            self.stderr.write(self.style.ERROR("Database "
+                                               "is not available after retries"))
             raise SystemExit(1)
 
         self.stdout.write(self.style.SUCCESS("Database is available!"))
