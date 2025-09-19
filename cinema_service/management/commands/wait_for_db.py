@@ -30,7 +30,7 @@ class Command(BaseCommand):
 
         if not conn:
             self.stderr.write(self.style.ERROR("Database is not "
-                                               "available after retries"))
+                                                        "available after retries"))
             raise SystemExit(1)
 
         self.stdout.write(self.style.SUCCESS("Database is available!"))
