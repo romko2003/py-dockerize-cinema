@@ -16,16 +16,19 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Встановлюємо залежності
-# (якщо в тебе інший файл — підстав актуальну назву)
+# Залежності
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копіюємо увесь проєкт
+# Код
 COPY . .
 
-# Порт API
+# Нерутовий користувач + права на каталоги для статик/медіа
+RUN useradd -m appuser \
+ && mkdir -p /vol/web/static /vol/web/media \
+ && chown -R appuser:appuser /vol
+USER appuser
+
 EXPOSE 8000
 
-# Запуск через gunicorn (оновлення БД/статик - у docker-compose команді)
-CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+CMD ["gunicorn", "cinema_service.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
