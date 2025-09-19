@@ -4,11 +4,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-# Системні пакунки, потрібні для psycopg2-binary/Pillow/HTTPS
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      build-essential \
-      libpq-dev \
       libjpeg62-turbo-dev \
       zlib1g-dev \
       ca-certificates \
@@ -23,12 +20,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Код
 COPY . .
 
-# Нерутовий користувач + права на каталоги для статик/медіа
-RUN useradd -m appuser \
- && mkdir -p /vol/web/static /vol/web/media \
- && chown -R appuser:appuser /vol
-USER appuser
+RUN useradd -m appuser
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
 
-CMD ["gunicorn", "cinema_service.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+ENTRYPOINT ["/entrypoint.sh"]

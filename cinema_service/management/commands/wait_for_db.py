@@ -6,31 +6,31 @@ from django.db.utils import OperationalError
 
 
 class Command(BaseCommand):
-    help_text = "Wait for database to be available"
+    help = "Wait for database to be available"
 
     def handle(self, *args, **options):
         max_retries = int(os.getenv("DB_WAIT_MAX_RETRIES", "60"))
         delay = float(os.getenv("DB_WAIT_DELAY", "1"))
 
-        self.stdout.write(self.style.WARNING("Waiting for database..."))
-        conn = None
+        self.stdout.write(self.style.WARNING("Waiting "
+                                             "for database..."))
+        ready = False
         retries = 0
 
-        while not conn and retries < max_retries:
+        while not ready and retries < max_retries:
             try:
-                conn = connections["default"]
-                conn.cursor()
+                connections["default"].cursor()
+                ready = True
             except OperationalError as exc:
                 retries += 1
-                self.stdout.write(f"DB unavailable ({exc}), retry "
-                                  f"{retries}; sleep {delay}s")
+                self.stdout.write(f"DB unavailable ({exc}), "
+                                  f"retry {retries}; sleep {delay}s")
                 time.sleep(delay)
-            else:
-                break
 
-        if not conn:
-            self.stderr.write(self.style.ERROR("Database is not "
-                                                        "available after retries"))
+        if not ready:
+            self.stderr.write(self.style.ERROR("Database "
+                                               "is not "
+                                               "available after retries"))
             raise SystemExit(1)
 
         self.stdout.write(self.style.SUCCESS("Database is available!"))

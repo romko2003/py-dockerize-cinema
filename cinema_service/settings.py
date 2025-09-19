@@ -6,22 +6,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- Core ---
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
 DEBUG = os.getenv("DEBUG", "1") == "1"
-ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "*").split(",") if h]
+ALLOWED_HOSTS = [h for h in
+                 os.getenv("ALLOWED_HOSTS", "*").split(",") if h]
 
-# --- Apps ---
+# --- Applications ---
 INSTALLED_APPS = [
+    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     # 3rd-party
     "rest_framework",
     "drf_spectacular",
     "rest_framework_simplejwt",
-    # local apps
-    "cinema",  # ← твій app, якщо назва інша — заміни
+
+    # Local
+    "cinema",
 ]
 
 MIDDLEWARE = [
@@ -37,6 +41,22 @@ MIDDLEWARE = [
 ROOT_URLCONF = "cinema_service.urls"
 WSGI_APPLICATION = "cinema_service.wsgi.application"
 
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
 # --- Database (PostgreSQL via env) ---
 DATABASES = {
     "default": {
@@ -49,16 +69,15 @@ DATABASES = {
     }
 }
 
-# --- Passwords (dev minimal) ---
+# --- Passwords (спрощено для dev/QA) ---
 AUTH_PASSWORD_VALIDATORS = []
 
-# --- I18N ---
+# --- I18N / TZ ---
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# --- Static/Media (✅ єдиний блок, читає з env; без дублювань) ---
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 STATIC_ROOT = os.getenv("STATIC_ROOT", str(BASE_DIR / "static"))
@@ -66,7 +85,7 @@ MEDIA_ROOT = os.getenv("MEDIA_ROOT", str(BASE_DIR / "media"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# --- DRF / JWT / Schema ---
+# --- DRF / JWT / OpenAPI ---
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -77,12 +96,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS":
         "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS":
+        "drf_spectacular.openapi.AutoSchema",
 }
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Cinema API",
     "VERSION": "1.0.0",
 }
-
-# --- Dev media serving in DEBUG (urls.py має додати static(...)) ---

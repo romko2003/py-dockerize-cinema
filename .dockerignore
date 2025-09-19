@@ -16,7 +16,7 @@ pip-wheel-metadata/
 .coverage
 
 # Envs
-.env
+.env*
 .venv/
 venv/
 env/
